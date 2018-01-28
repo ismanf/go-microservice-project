@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/ismayilmalik/go-microservice-project/booking/handler"
 	"net/http"
 )
 
@@ -22,5 +23,11 @@ var routes = Routes {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("Hello"))
 		},
+	},
+	Route {
+		"AddBooking",
+		"POST",
+		"/bookings",
+		handler.Create,
 	},
 }
