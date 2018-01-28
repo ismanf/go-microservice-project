@@ -37,4 +37,10 @@ var routes = Routes{
 		"/bookings",
 		handler.GetAll,
 	},
+	Route{
+		"HealthCheck",
+		"GET",
+		"/health",
+		handler.Check,
+	},
 }
