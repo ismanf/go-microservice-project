@@ -1,21 +1,22 @@
 package service
 
 import (
-	"github.com/ismayilmalik/go-microservice-project/booking/handler"
 	"net/http"
+
+	"github.com/ismayilmalik/go-microservice-project/booking/handler"
 )
 
 type Route struct {
-	Name string
-	Method string
-	Pattern string
+	Name        string
+	Method      string
+	Pattern     string
 	HandlerFunc http.HandlerFunc
 }
 
 type Routes []Route
 
-var routes = Routes {
-	Route {
+var routes = Routes{
+	Route{
 		"Hello",
 		"GET",
 		"/hello",
@@ -24,10 +25,16 @@ var routes = Routes {
 			w.Write([]byte("Hello"))
 		},
 	},
-	Route {
+	Route{
 		"AddBooking",
 		"POST",
 		"/bookings",
 		handler.Create,
+	},
+	Route{
+		"GetBookings",
+		"GET",
+		"/bookings",
+		handler.GetAll,
 	},
 }
