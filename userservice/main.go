@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"database/sql"
 	"fmt"
 	"log"
@@ -21,13 +22,25 @@ func main() {
 		host,
 		port,
 		name)
+	
 
 	db, err := sql.Open(driver, connectionString)
 	if err != nil {
 		log.Fatal("Db initialization failed", err)
 	}
 
+	cache := Cache{}
+	cache.Client = cache.NewClient()
+	
+	flag.BoolVar(
+		&cache.Enabled,
+		"cache_enabled",
+		false,
+		"Enable cache",
+	)
+	flag.Parse()
+
 	a := App{}
-	a.Initialize(db)
+	a.Initialize(db, cache)
 	a.Run(":5000")
 }

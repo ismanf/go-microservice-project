@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -13,12 +14,14 @@ import (
 )
 
 type App struct {
+	Cache Cache
 	DB     *sql.DB
 	Router *mux.Router
 }
 
-func (a *App) Initialize(db *sql.DB) {
+func (a *App) Initialize(db *sql.DB, cache Cache) {
 	a.DB = db
+	a.Cache = cache
 	a.Router = mux.NewRouter()
 	a.initializeRoutes()
 }
@@ -39,7 +42,16 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
+	var response []byte
+	switch payload.(type) {
+	case string: {
+		str, _ := payload.(string)
+		response = []byte(str)
+	}
+	default:
+		response, _ = json.Marshal(payload)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
@@ -52,6 +64,13 @@ func (a *App) getUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
+
+	key := fmt.Sprintf("%s|%d",r.URL.Path,id)
+	if val, err := a.Cache.getValue(key); err == nil && len(val) != 0 {
+		respondWithJSON(w, http.StatusOK, val)
+		return
+	} 
+
 	user := User{ID: id}
 	if err := user.get(a.DB); err != nil {
 		switch err {
@@ -60,6 +79,11 @@ func (a *App) getUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 		}
+		return
+	}
+
+	if err:= a.Cache.setValue(key, user); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
