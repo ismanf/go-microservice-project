@@ -8,6 +8,7 @@ import (
 )
 
 type Cache struct {
+	Address string
 	Enabled bool
 	Client  *redis.Client
 }
@@ -29,7 +30,7 @@ func (c *Cache) setValue(key string, value interface{}) error {
 
 func (c *Cache) NewClient() *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr:         ":6379",
+		Addr:         c.Address,
 		DialTimeout:  10 * time.Second,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,

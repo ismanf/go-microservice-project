@@ -1,37 +1,25 @@
 package main
 
 import (
-	"flag"
 	"database/sql"
-	"fmt"
+	"flag"
 	"log"
+	"os"
 )
 
 func main() {
-	name := "mobesetCore"
-	host := "127.0.0.1"
-	port := 3306
-	user := "root"
-	password := "123456"
-	driver := "mysql"
-
-	connectionString := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
-		user,
-		password,
-		host,
-		port,
-		name)
-	
-
-	db, err := sql.Open(driver, connectionString)
+	//initialize mysqldb
+	connectionString := os.Getenv("USERSVC_DB_HOST")
+	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
 		log.Fatal("Db initialization failed", err)
 	}
 
-	cache := Cache{}
+	//initialize redis
+	redisAddr := os.Getenv("USERSVC_RD_ADDR")
+	cache := Cache{ Address: redisAddr}
 	cache.Client = cache.NewClient()
-	
+
 	flag.BoolVar(
 		&cache.Enabled,
 		"cache_enabled",
@@ -42,5 +30,5 @@ func main() {
 
 	a := App{}
 	a.Initialize(db, cache)
-	a.Run(":5000")
+	a.Run(":3000")
 }

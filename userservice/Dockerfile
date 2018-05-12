@@ -18,7 +18,7 @@ WORKDIR $GOPATH/src/app
 
 # build and run
 RUN go build -o main .
-CMD ["/go/src/app/main -cache_enabled=true"]
+CMD /go/src/app/main -cache_enabled=true
 
 # expose port
 EXPOSE 5000
