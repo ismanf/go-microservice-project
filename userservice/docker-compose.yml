@@ -17,7 +17,6 @@ services:
     healthcheck:
       test: exit 0
   userservice:
-    container_name: userservice
     image: userservice
     build: .
     environment: 
@@ -33,3 +32,10 @@ services:
     links:
       - db
       - redis
+  proxy:
+    container_name: userservice_loadbalance
+    build: ./nginx
+    ports:
+      - 80:80
+    links:
+      - userservice
