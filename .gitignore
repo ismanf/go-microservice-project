@@ -16,3 +16,4 @@
 
 # Go Dependency
 **/vendor/
+famous-news-service/node_modules
