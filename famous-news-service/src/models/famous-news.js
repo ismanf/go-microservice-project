@@ -1,6 +1,4 @@
-import mongoose, {Schema} from 'mongoose'
-
-let newsSchema = new Schema({
+let _schema = {
     title: {
         type: String,
         minlength: 10,
@@ -23,8 +21,11 @@ let newsSchema = new Schema({
         type: String,
         maxlength: 100
     }
-})
+}
 
-let News = mongoose.model('News', newsSchema)
+const makeFamousNewsModel = (orm) => {
+    let schema = new orm.Schema(_schema)
+    return orm.model('News', schema)
+}
 
-export default News
+export default makeFamousNewsModel

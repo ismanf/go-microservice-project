@@ -1,11 +1,15 @@
 import express from 'express'
-import NewsController from './controller'
-import { resolve } from 'dns';
+import bodyParser from 'bodyParser'
+import middlewares from './middlewares'
+import registerRoutes from './routes'
 
 const app = express()
-const controller = new NewsController()
 
+//Register all routes
+registerRoutes(app)
 
-app.route('/news').get(controller.getAllNews)
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(middlewares.errorHandler)
 
 export default app

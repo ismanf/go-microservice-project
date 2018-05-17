@@ -1,5 +1,7 @@
 export default {
-    db: {
-        connectionString: ''
+    dev: {
+        mongodb: {
+            connextionstring: 'mongodb://localhost:27017'
+        }
     }
 }
