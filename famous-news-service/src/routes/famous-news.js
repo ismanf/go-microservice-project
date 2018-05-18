@@ -5,6 +5,8 @@ const registerRoutes = (controller) => {
 
     router.route('/')
         .get(controller.getAllNews)
+
+    return router
 }
 
 export default registerRoutes

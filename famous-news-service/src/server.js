@@ -1,25 +1,13 @@
+import mongoose, { mongo } from 'mongoose'
 import app from './app'
-import dbconnection from './db'
+import config from './config'
 
-const startServer = (server) => {
-    return new Promise((resolve, reject) => {
-        server.listen(3001, (err) => {
-            if(err) {
-                return reject(err)
-            }
-            resolve('OK')
-        })
-    })
-}
+//TODO: improve db connection
+mongoose.connect(config.dev.mongodb.connectionstring)
 
-dbconnection
-    .then(db => {
-        console.log('Connected to db')
-        return startServer(app)
-    })
-    .then(res => {
-        console.log('App is ready..')
-    })
-    .catch(err => {
-        console.log('something bad happened', err)
-    })
+app.listen(config.dev.app.port, (err) => {
+    if (err) {
+        console.log('Server can not start:', err)
+    }
+    console.log('Server started on port:', config.dev.app.port)
+})

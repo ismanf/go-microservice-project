@@ -1,7 +1,10 @@
 export default {
     dev: {
         mongodb: {
-            connextionstring: 'mongodb://localhost:27017'
+            connectionstring: 'mongodb://localhost:27017/famousnews'
+        },
+        app: {
+            port: 3001
         }
     }
 }

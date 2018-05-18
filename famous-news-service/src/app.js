@@ -1,5 +1,5 @@
 import express from 'express'
-import bodyParser from 'bodyParser'
+import bodyParser from 'body-parser'
 import middlewares from './middlewares'
 import registerRoutes from './routes'
 

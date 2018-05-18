@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node bootstrap.js"
+    "start": "nodemon bootstrap.js"
   },
   "author": "",
   "license": "ISC",

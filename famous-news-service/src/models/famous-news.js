@@ -1,7 +1,7 @@
 let _schema = {
     title: {
         type: String,
-        minlength: 10,
+        minlength: 5,
         maxlength: 200,
         required: true
     },
