@@ -1,10 +1,10 @@
 export default {
     dev: {
         mongodb: {
-            connectionstring: 'mongodb://localhost:27017/famousnews'
+            connectionstring: `${process.env.MONGODB_HOST}/${process.env.DATABASE}`
         },
         app: {
-            port: 3001
+            port: process.env.SERVICE_PORT
         }
     }
 }

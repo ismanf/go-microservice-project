@@ -1,0 +1,23 @@
+version: '2.1'
+services: 
+  mongo:
+      image: mongo:latest
+      container_name: "mongodb"
+      ports:
+        - 27017:27017
+      command: mongod --smallfiles --logpath=/dev/null
+  famous_news_service:
+      image: famous_news_service
+      build: .
+      volumes:
+        - '.:/usr/src/app'
+      environment: 
+        - MONGODB_HOST=mongodb://mongo:27017
+        - DATABASE=famousnews
+        - SERVICE_PORT=3001
+      ports:
+        - 3001:3001
+      depends_on: 
+        - mongo
+      links: 
+        - mongo

@@ -5,6 +5,7 @@ const registerRoutes = (controller) => {
 
     router.route('/')
         .get(controller.getAllNews)
+        .post(controller.create)
 
     return router
 }
