@@ -1,8 +1,7 @@
-import mongoose from 'mongoose'
-import makeFamousNewsModel from './famous-news'
-
-mongoose.Promise = Promise
+import makeQueryModel from './query-news'
+import makeCommandModel from './command-news'
 
 export default {
-    FamousNews: makeFamousNewsModel(mongoose)
+    makeCommandModel,
+    makeQueryModel
 }

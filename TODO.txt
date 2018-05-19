@@ -1,0 +1,3 @@
+- Move docker compose file to root and orcestrate all containers
+- change docker file for userservice in order to load dependency when creating image
+- create IoC container in news service and make it the single source of truth

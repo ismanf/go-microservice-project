@@ -1,7 +1,26 @@
+import assert from 'assert'
+
 export default class FamousNewsController {
 
-    constructor({ model }) {
-        this.model = model
+    constructor({ 
+        commandNewsModel,
+        queryNewsModel,
+        amqp
+    }) {
+        //validate options
+        assert(commandNewsModel, '"commandNewsModel" is undefined')
+        assert(queryNewsModel, '"queryNewsModel" is undefined')
+        assert(ampq, '"amqp" is undefined')
+
+        this.commandNewsModel = commandNewsModel
+        this.queryNewsModel = queryNewsModel
+        this.ampq = ampq
+
+        this.events = {
+            NEWS_CREATE = 'news.create',
+            NEWS_UPDATE = 'news.update'
+        }
+
         this.getAllNews = this.getAllNews.bind(this)
         this.create = this.create.bind(this)
     }
@@ -28,5 +47,7 @@ export default class FamousNewsController {
                 return next(error)
             })
     }
+
+    _normalizeDb()
 
 }
