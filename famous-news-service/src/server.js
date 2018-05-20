@@ -5,7 +5,10 @@ import config from './config'
 import initServices from './services'
 import db from './db'
 
-const bus = servicebus.bus()
+const bus = servicebus.bus({
+    url: config.dev.amqp.url
+})
+
 const services = initServices(db, bus)
 const server = dnode(services.methods)
 

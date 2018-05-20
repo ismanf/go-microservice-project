@@ -3,6 +3,9 @@ export default {
         mongodb: {
             connectionstring: `${process.env.MONGODB_HOST}/${process.env.DATABASE}`
         },
+        amqp:{
+            url: 'amqp://user:pass@localhost:5672'
+        },
         app: {
             port: process.env.SERVICE_PORT
         },
