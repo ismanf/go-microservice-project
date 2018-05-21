@@ -1,10 +1,15 @@
+import dotenv from 'dotenv'
+
+// Initialize env variables
+dotenv.config()
+
 export default {
     dev: {
         mongodb: {
             connectionstring: `${process.env.MONGODB_HOST}/${process.env.DATABASE}`
         },
         amqp:{
-            url: 'amqp://user:pass@localhost:5672'
+            url: process.env.AMQP_URL
         },
         app: {
             port: process.env.SERVICE_PORT
@@ -12,7 +17,7 @@ export default {
         sequelize_config: {
             database: 'famousnews',
             username: 'root',
-            password: null,
+            password: '123456',
             options: {
                 dialect: 'mysql',
                 port: 3306,
@@ -22,7 +27,7 @@ export default {
                     freezeTableName: false,
                     charset: 'utf8',
                     dialectOptions: {
-                      collate: 'utf8_general_ci'
+                      collate: 'utf8_default'
                     },
                     timestamps: false
                 },

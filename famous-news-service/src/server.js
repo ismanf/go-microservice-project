@@ -5,16 +5,13 @@ import config from './config'
 import initServices from './services'
 import db from './db'
 
+// Initialize ampq broker client
 const bus = servicebus.bus({
     url: config.dev.amqp.url
 })
 
 const services = initServices(db, bus)
 const server = dnode(services.methods)
-
-server.on('error', (err) => {
-    console.log('dnode error:', err)
-})
 
 //Start server....
 async.waterfall([
@@ -25,7 +22,7 @@ async.waterfall([
             return next()
         }).catch((err) => {
             console.log('DB failed:', err)
-            return nex(err)
+            return next(err)
         })
     },
 

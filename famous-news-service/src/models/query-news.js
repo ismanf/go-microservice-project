@@ -1,3 +1,4 @@
+
 const makeModel = (mongoose) => {
     let _schema = {
         title: {
@@ -24,7 +25,7 @@ const makeModel = (mongoose) => {
         }
     }
 
-    let schema = new mongoose.Schema(_schema)
+    let schema = new mongoose.Schema(_schema, { versionKey: false })
     let model =  mongoose.model('News', schema)
     
     return model

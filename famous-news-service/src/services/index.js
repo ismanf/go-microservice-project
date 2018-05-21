@@ -1,11 +1,15 @@
 import CommandService from './command-service'
 import QueryService from './query-service'
 
-const initializeServices = (db, ampq) => {
+const initializeServices = (db, amqp) => {
 
     const commandService = new CommandService({ db, amqp })
     const queryService = new QueryService({ db, amqp })
-    const methods = Object.assign({}, commandService, queryService)
+    
+    const methods = {
+        addNews: commandService.addNews,
+        getAll: queryService.getAll
+    }
 
     return {
         commandService,

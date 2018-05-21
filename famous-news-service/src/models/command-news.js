@@ -1,5 +1,9 @@
 const makeModel = (sequelize, Sequelize) => {
     let _schema = {
+        id: {
+            type: Sequelize.UUID,
+            primaryKey: true
+        },
         title: {
             type: Sequelize.STRING,
             unique: true,
@@ -18,6 +22,7 @@ const makeModel = (sequelize, Sequelize) => {
         },
         author: {
             type: Sequelize.STRING,
+            max: 200,
             allowNull: false
         },
         created_at: Sequelize.DATE ,

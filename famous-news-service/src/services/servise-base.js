@@ -1,16 +1,16 @@
 class ResponseFormat {
-    constructor(error, payload ) {
-        this.error = error
-        this.payload = payload
+    constructor(error, payload) {
+        this.error = error || ''
+        this.payload = payload || ''
     }
 }
 
 export default class ServiceBase {
 
-    constructor(){
+    constructor() {
         this.events = {
-            NEWS_CREATE = 'news.create',
-            NEWS_UPDATE = 'news.update'
+            NEWS_CREATE: 'news.create',
+            NEWS_UPDATE: 'news.update'
         }
     }
 

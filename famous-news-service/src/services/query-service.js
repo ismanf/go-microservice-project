@@ -11,16 +11,16 @@ class QueryServiceNews extends ServiceBase {
 
         //Set up events
         amqp.listen(this.events.NEWS_CREATE, { ack: true }, this._save)
-        amqp.listen(this.events.NEWS_UPDATE, { ack: true }, this._update)
+        //amqp.listen(this.events.NEWS_UPDATE, { ack: true }, this._update)
     }
 
     _save(event) {
-        this.db.queryModel.create(event.data)
+        this.db.queryModel.create(event)
             .then(() => event.handle.ack())
             .catch(err => event.handle.reject())
     }
 
-    _update(event) {
+    /*_update(event) {
         const data = event.data
         this.db.queryModel.updateOne(
             { id: data.id },
@@ -30,7 +30,7 @@ class QueryServiceNews extends ServiceBase {
             })
             .then(() => event.handle.ack())
             .catch(err => event.handle.reject())
-    }
+    }*/
 
     getAll(query, reply) {
         const self = this

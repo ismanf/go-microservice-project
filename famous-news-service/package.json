@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node bootstrap.js"
+    "start": "nodemon bootstrap.js",
+    "rstart": "nodemon bootstrap.js --ignore ./rpc-test/*"
   },
   "author": "",
   "license": "ISC",
@@ -12,11 +13,13 @@
     "async": "^2.6.0",
     "body-parser": "^1.18.3",
     "dnode": "^1.2.2",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "mongoose": "^5.1.1",
     "mysql2": "^1.5.3",
     "sequelize": "^4.37.8",
-    "servicebus": "^2.2.0"
+    "servicebus": "^2.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

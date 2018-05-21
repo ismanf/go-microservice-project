@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
 )
 
 //Init models
-let commandModel = sequelize.import(models.makeCommandModel)
+let commandModel = models.makeCommandModel(sequelize, Sequelize)
 let queryModel = models.makeQueryModel(mongoose)
 
 const initConnections = () => {
