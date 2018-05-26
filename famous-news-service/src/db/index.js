@@ -5,14 +5,12 @@ import config from '../config'
 import models from '../models'
 
 //Configure mongodb orm
-mongoose.Promise = Promise
+mongoose.Promise = global.Promise
 
 //Configure mysql orm
 const sequelize_config = config.dev.sequelize_config
 const sequelize = new Sequelize(
-    sequelize_config.database,
-    sequelize_config.username,
-    sequelize_config.password,
+    sequelize_config.connectionstring,
     sequelize_config.options
 )
 

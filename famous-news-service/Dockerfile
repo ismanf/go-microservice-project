@@ -1,5 +1,5 @@
 # Long term support version
-FROM node:carbon
+FROM node:latest
 
 LABEL Name="famous_news_service" Version=0.1.0
 

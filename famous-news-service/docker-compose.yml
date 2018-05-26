@@ -1,23 +1,34 @@
 version: '2.1'
 services: 
-  mongo:
-      image: mongo:latest
-      container_name: "mongodb"
-      ports:
+  querydb_famous: 
+      image: querydb_famous
+      build: './src/db/query'
+      ports: 
         - 27017:27017
-      command: mongod --smallfiles --logpath=/dev/null
+      restart: always
+  commanddb_famous:
+      image: commanddb_famous
+      build: './src/db/command'
+      ports: 
+        - 3306:3306
+      restart: always
+      healthcheck:
+        test: exit 0
   famous_news_service:
       image: famous_news_service
       build: .
-      volumes:
-        - '.:/usr/src/app'
       environment: 
-        - MONGODB_HOST=mongodb://mongo:27017
         - DATABASE=famousnews
+        - QUERYDB_HOST=mongodb://querydb_famous:27017
+        - COMMANDDB_HOST=commanddb_famous:3306
+        - AMQP_URL=amqp://guest:guest@localhost:5672
         - SERVICE_PORT=3001
+        - DOCKER_ENV=true
       ports:
         - 3001:3001
       depends_on: 
-        - mongo
+        - querydb_famous
+        - commanddb_famous
       links: 
-        - mongo
+        - querydb_famous
+        - commanddb_famous

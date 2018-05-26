@@ -1,16 +1,16 @@
 import dnode from 'dnode'
 import async from 'async'
-import servicebus from 'servicebus'
+import Tortoise from 'tortoise'
 import config from './config'
 import initServices from './services'
 import db from './db'
 
-// Initialize ampq broker client
-const bus = servicebus.bus({
-    url: config.dev.amqp.url
-})
+console.log(config)
 
-const services = initServices(db, bus)
+// Initialize ampq broker client
+const amqpBus = new Tortoise(config.dev.amqp.url)
+
+const services = initServices(db, amqpBus)
 const server = dnode(services.methods)
 
 //Start server....

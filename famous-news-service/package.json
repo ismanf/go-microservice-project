@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon bootstrap.js",
+    "start": "node bootstrap.js",
     "rstart": "nodemon bootstrap.js --ignore ./rpc-test/*"
   },
   "author": "",
@@ -19,6 +19,7 @@
     "mysql2": "^1.5.3",
     "sequelize": "^4.37.8",
     "servicebus": "^2.2.0",
+    "tortoise": "^1.0.1",
     "uuid": "^3.2.1"
   },
   "devDependencies": {

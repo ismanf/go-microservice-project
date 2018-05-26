@@ -30,14 +30,11 @@ class CommandServiceNews extends ServiceBase {
                     .catch(err => next(err))
             },
             function publisEvent(news, next) {
-                console.log('news', news)
-                try {
-                    self.amqp.send(self.events.NEWS_CREATE, news)
-                    next()
-                } catch (e) {
-                    console.log('errorrr', e)
-                    next(e)
-                }
+                self.amqp
+                    .queue(self.events.NEWS_CREATE)
+                    .publish(data)
+                
+                next()
             }
         ], function (error, result) {
             self.respond(error, newUuid, reply)

@@ -5,11 +5,11 @@ var d = dnode.connect(3001);
 
 let _schema = {
     id: uuid(),
-    title: 'Hellooo worldsdjwwjfs1',
-    content: 'Whats going on111....',
-    author: 'kogdfgdf dfgdfgdfg111',
-    news_type: 'lolo11',
-    tags: 'dfgdfg11'
+    title: 'erertwer',
+    content: 'Whats werwerwerwer sdfsdf....',
+    author: 'kogdfgdfwerewr sdfsdf',
+    news_type: 'lolwerwersdso11',
+    tags: 'dfgdfsdsdg11'
 }
 
 d.on('remote', function (remote) {

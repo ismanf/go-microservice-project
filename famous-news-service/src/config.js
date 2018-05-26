@@ -1,12 +1,14 @@
 import dotenv from 'dotenv'
 
 // Initialize env variables
-dotenv.config()
+if(!process.env.DOCKER_ENV){
+    dotenv.config()
+}
 
 export default {
     dev: {
         mongodb: {
-            connectionstring: `${process.env.MONGODB_HOST}/${process.env.DATABASE}`
+            connectionstring: `${process.env.QUERYDB_HOST}/${process.env.DATABASE}`
         },
         amqp:{
             url: process.env.AMQP_URL
@@ -15,12 +17,9 @@ export default {
             port: process.env.SERVICE_PORT
         },
         sequelize_config: {
-            database: 'famousnews',
-            username: 'root',
-            password: '123456',
+            connectionstring: `mysql://root:@${process.env.COMMANDDB_HOST}/${process.env.DATABASE}`,
             options: {
                 dialect: 'mysql',
-                port: 3306,
                 logging: false,
                 define: {
                     underscored: false,

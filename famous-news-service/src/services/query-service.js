@@ -7,30 +7,19 @@ class QueryServiceNews extends ServiceBase {
         super()
         this.db = db
         this.getAll = this.getAll.bind(this)
-        this._save = this._save.bind(this)
 
-        //Set up events
-        amqp.listen(this.events.NEWS_CREATE, { ack: true }, this._save)
-        //amqp.listen(this.events.NEWS_UPDATE, { ack: true }, this._update)
+        amqp.queue(this.events.NEWS_CREATE)
+            .prefetch(1)
+            .json()
+            .subscribe(this._save.bind(this))
     }
 
-    _save(event) {
-        this.db.queryModel.create(event)
-            .then(() => event.handle.ack())
-            .catch(err => event.handle.reject())
+    _save(data, cb) {
+        cb()
+        this.db.queryModel.create(data)
+            .then(() => console.log('[_save]Data saved!'))
+            .catch(err => console.log('[_save]Error on saving new data:', err))
     }
-
-    /*_update(event) {
-        const data = event.data
-        this.db.queryModel.updateOne(
-            { id: data.id },
-            {
-                content: data.content,
-                tags: data.tags,
-            })
-            .then(() => event.handle.ack())
-            .catch(err => event.handle.reject())
-    }*/
 
     getAll(query, reply) {
         const self = this
