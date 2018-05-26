@@ -17,9 +17,13 @@ export default {
             port: process.env.SERVICE_PORT
         },
         sequelize_config: {
-            connectionstring: `mysql://root:@${process.env.COMMANDDB_HOST}/${process.env.DATABASE}`,
+            database: process.env.DATABASE,
+            username: 'root',
+            password: '123456',
             options: {
+                host: process.env.COMMANDDB_HOST,
                 dialect: 'mysql',
+                port: 3307,
                 logging: false,
                 define: {
                     underscored: false,

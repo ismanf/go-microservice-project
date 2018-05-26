@@ -1,5 +1,15 @@
 version: '2.1'
 services: 
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=secret_cookie
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 15672:15672
+      - 5672:5672
   querydb_famous: 
       image: querydb_famous
       build: './src/db/query'
@@ -9,8 +19,10 @@ services:
   commanddb_famous:
       image: commanddb_famous
       build: './src/db/command'
+      environment:
+        - MYSQL_ROOT_PASSWORD=123456
       ports: 
-        - 3306:3306
+        - 3307:3306
       restart: always
       healthcheck:
         test: exit 0
@@ -20,8 +32,8 @@ services:
       environment: 
         - DATABASE=famousnews
         - QUERYDB_HOST=mongodb://querydb_famous:27017
-        - COMMANDDB_HOST=commanddb_famous:3306
-        - AMQP_URL=amqp://guest:guest@localhost:5672
+        - COMMANDDB_HOST=192.168.99.100
+        - AMQP_URL=amqp://guest:guest@rabbitmq:5672
         - SERVICE_PORT=3001
         - DOCKER_ENV=true
       ports:
@@ -29,6 +41,8 @@ services:
       depends_on: 
         - querydb_famous
         - commanddb_famous
+        - rabbitmq
       links: 
         - querydb_famous
         - commanddb_famous
+        - rabbitmq

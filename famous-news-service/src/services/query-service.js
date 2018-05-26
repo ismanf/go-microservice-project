@@ -15,6 +15,7 @@ class QueryServiceNews extends ServiceBase {
     }
 
     _save(data, cb) {
+        console.log('on query..')
         cb()
         this.db.queryModel.create(data)
             .then(() => console.log('[_save]Data saved!'))

@@ -2,6 +2,8 @@
 DROP DATABASE IF EXISTS `famousnews`;
 CREATE DATABASE `famousnews`;
 
+USE `famousnews`;
+
 DROP TABLE IF EXISTS `news`;
 CREATE TABLE `news` (
   `id` varchar(36) NOT NULL,
