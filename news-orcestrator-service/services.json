@@ -1,0 +1,14 @@
+{
+    "famous": {
+        "port": 3001,
+        "host": ""
+    },
+    "politic": {
+        "port": 3002,
+        "host": ""
+    },
+    "sport": {
+        "port": 3003,
+        "host":""
+    }
+}
