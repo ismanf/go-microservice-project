@@ -5,8 +5,6 @@ import config from './config'
 import initServices from './services'
 import db from './db'
 
-console.log(config)
-
 // Initialize ampq broker client
 const amqpBus = new Tortoise(config.dev.amqp.url)
 

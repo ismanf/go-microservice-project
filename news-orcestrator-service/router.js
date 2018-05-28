@@ -1,6 +1,6 @@
 import express from 'express'
 
-const registerRoutes = (controller) => {
+const initRouter = (controller) => {
     const router = express.Router()
 
     router.route('/:news_type')
@@ -18,4 +18,4 @@ const registerRoutes = (controller) => {
     return router
 }
 
-export default registerRoutes
+export default initRouter

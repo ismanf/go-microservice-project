@@ -1,5 +1,32 @@
 version: '2.1'
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=secret_cookie
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 15672:15672
+      - 5672:5672
+  querydb_famous: 
+      image: querydb_famous
+      build: './src/db/query'
+      ports: 
+        - 27017:27017
+      restart: always
+  commanddb_famous:
+      image: commanddb_famous
+      build: './src/db/command'
+      environment:
+        - MYSQL_ROOT_PASSWORD=123456
+      ports: 
+        - 3307:3306
+      restart: always
+      healthcheck:
+        test: exit 0
+  famous_news_service:
   redis: 
     container_name: redis
     image: redis:latest

@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "dnode": "^1.2.2",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3"
   }
 }
