@@ -1,32 +1,5 @@
 version: '2.1'
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    hostname: rabbitmq
-    environment:
-      - RABBITMQ_ERLANG_COOKIE=secret_cookie
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    ports:
-      - 15672:15672
-      - 5672:5672
-  querydb_famous: 
-      image: querydb_famous
-      build: './src/db/query'
-      ports: 
-        - 27017:27017
-      restart: always
-  commanddb_famous:
-      image: commanddb_famous
-      build: './src/db/command'
-      environment:
-        - MYSQL_ROOT_PASSWORD=123456
-      ports: 
-        - 3307:3306
-      restart: always
-      healthcheck:
-        test: exit 0
-  famous_news_service:
   redis: 
     container_name: redis
     image: redis:latest
@@ -34,9 +7,9 @@ services:
       - 6379:6379
     healthcheck:
       test: exit 0
-  db: 
-    container_name: db
-    image: db
+  db_usersvc: 
+    container_name: db_usersvc
+    image: db_usersvc
     build: ./db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
@@ -48,17 +21,63 @@ services:
     build: .
     environment: 
       - USERSVC_RD_ADDR=redis:6379
-      - USERSVC_DB_HOST=root:123456@tcp(db:3306)/usersvc?parseTime=true&multiStatements=true&allowNativePasswords=True
+      - USERSVC_DB_HOST=root:123456@tcp(db_usersvc:3306)/usersvc?parseTime=true&multiStatements=true&allowNativePasswords=True
     depends_on:
-      db:
+      db_usersvc:
         condition: service_healthy
       redis:
         condition: service_healthy
     ports:
       - 8000:3000
     links:
-      - db
+      - db_usersvc
       - redis
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=secret_cookie
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 15672:15672
+      - 5672:5672
+  querydb_famous: 
+    image: querydb_famous
+    build: './src/db/query'
+    ports: 
+      - 27017:27017
+    restart: always
+  commanddb_famous:
+    image: commanddb_famous
+    build: './src/db/command'
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    ports: 
+      - 3307:3306
+    restart: always
+    healthcheck:
+      test: exit 0
+  famous_news_service:
+    image: famous_news_service
+    build: .
+    environment: 
+      - DATABASE=famousnews
+      - QUERYDB_HOST=mongodb://querydb_famous:27017
+      - COMMANDDB_HOST=192.168.99.100
+      - AMQP_URL=amqp://guest:guest@rabbitmq:5672
+      - SERVICE_PORT=3001
+      - DOCKER_ENV=true
+    ports:
+      - 3001:3001
+    depends_on: 
+      - querydb_famous
+      - commanddb_famous
+      - rabbitmq
+    links: 
+      - querydb_famous
+      - commanddb_famous
+      - rabbitmq
   proxy:
     container_name: userservice_loadbalance
     build: ./nginx
