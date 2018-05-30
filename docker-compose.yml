@@ -10,7 +10,7 @@ services:
   db_usersvc: 
     container_name: db_usersvc
     image: db_usersvc
-    build: ./db
+    build: ./userservice/db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: usersvc
@@ -18,7 +18,7 @@ services:
       test: exit 0
   userservice:
     image: userservice
-    build: .
+    build: ./userservice
     environment: 
       - USERSVC_RD_ADDR=redis:6379
       - USERSVC_DB_HOST=root:123456@tcp(db_usersvc:3306)/usersvc?parseTime=true&multiStatements=true&allowNativePasswords=True
@@ -44,13 +44,13 @@ services:
       - 5672:5672
   querydb_famous: 
     image: querydb_famous
-    build: './src/db/query'
+    build: ./famous-news-service/src/db/query
     ports: 
       - 27017:27017
     restart: always
   commanddb_famous:
     image: commanddb_famous
-    build: './src/db/command'
+    build: ./famous-news-service/src/db/command
     environment:
       - MYSQL_ROOT_PASSWORD=123456
     ports: 
@@ -60,7 +60,7 @@ services:
       test: exit 0
   famous_news_service:
     image: famous_news_service
-    build: .
+    build: ./famous-news-service
     environment: 
       - DATABASE=famousnews
       - QUERYDB_HOST=mongodb://querydb_famous:27017
@@ -78,6 +78,93 @@ services:
       - querydb_famous
       - commanddb_famous
       - rabbitmq
+  commanddb_politic: 
+    image: commanddb_politic
+    build: ./politic-news-service/src/db/command
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    ports: 
+      - 3307:3306
+    restart: always
+    healthcheck:
+      test: exit 0
+  querydb_politic: 
+    image: querydb_politic
+    build: ./politic-news-service/src/db/query
+    ports: 
+      - 27017:27017
+    restart: always
+  politic_news_service:
+    image: politic_news_service
+    build: ./politic-news-service
+    environment: 
+      - DATABASE=politicnews
+      - QUERYDB_HOST=mongodb://querydb_politic:27017
+      - COMMANDDB_HOST=192.168.99.100
+      - AMQP_URL=amqp://guest:guest@rabbitmq:5672
+      - SERVICE_PORT=3002
+      - DOCKER_ENV=true
+    ports:
+      - 3002:3002
+    depends_on: 
+      - querydb_politic
+      - commanddb_politic
+      - rabbitmq
+    links: 
+      - querydb_politic
+      - commanddb_politic
+      - rabbitmq
+  commanddb_sport: 
+    image: commanddb_sport
+    build: ./sport-news-service/src/db/command
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    ports: 
+      - 3307:3306
+    restart: always
+    healthcheck:
+      test: exit 0
+  querydb_sport: 
+    image: querydb_sport
+    build: ./sport-news-service/src/db/query
+    ports: 
+      - 27017:27017
+    restart: always
+  sport_news_service:
+    image: sport_news_service
+    build: ./sport-news-service
+    environment: 
+      - DATABASE=sportnews
+      - QUERYDB_HOST=mongodb://querydb_sport:27017
+      - COMMANDDB_HOST=192.168.99.100
+      - AMQP_URL=amqp://guest:guest@rabbitmq:5672
+      - SERVICE_PORT=3003
+      - DOCKER_ENV=true
+    ports:
+      - 3003:3003
+    depends_on: 
+      - querydb_sport
+      - commanddb_sport
+      - rabbitmq
+    links: 
+      - querydb_sport
+      - commanddb_sport
+      - rabbitmq
+  news_orcestrator_service:
+    image: news_orcestrator_service
+    build: ./news-orcestrator-service
+    environment: 
+      - SERVICE_PORT=5000
+    ports: 
+      - 5000:5000
+    depends_on: 
+      - famous_news_service
+      - politic_news_service
+      - sport_news_service
+    links:
+      - famous_news_service
+      - politic_news_service
+      - sport_news_service
   proxy:
     container_name: userservice_loadbalance
     build: ./nginx
