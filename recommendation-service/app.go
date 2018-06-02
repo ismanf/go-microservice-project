@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/gob"
+	"bytes"
+	"github.com/streadway/amqp"
 	"reflect"
 	"strconv"
 	"encoding/json"
@@ -12,17 +15,20 @@ import (
 )
 
 const (
-	COL = "news"
-	DATABASE = "recommendationnews"
+	COL = "recommended_news"
+	DATABASE = "recommendations"
+	QUEUE_CREATE = "recommendations.create"
 )
 
 type App struct {
 	db *mgo.Session
+	mb *amqp.Channel
 	router *mux.Router
 }
 
-func (a *App) Initialize(db *mgo.Session) {
+func (a *App) Initialize(db *mgo.Session, mb *amqp.Channel) {
 	a.db = db
+	a.mb = mb
 }
 
 func (a *App) Run(addr string) {
@@ -46,6 +52,25 @@ func (a *App) initializeRoutes() {
 	a.router.
 		HandleFunc("/recommendations/byuser/{user_id:[0-9]}/", a.getUserRecommendations).
 		Methods("GET")
+}
+
+func (a *App) listenQeueue() {
+	msgs, err := a.mb.Consume(
+		QUEUE_CREATE,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	checkError(err)
+
+	go func() {
+		for d := range msgs {
+			a.saveRecommendation(d.Body)
+		}
+	}()
 }
 
 // Api actions
@@ -89,6 +114,29 @@ func (a *App) getUserRecommendations(w http.ResponseWriter, r *http.Request) {
 	 }
 	
 	 respondWithJSON(w, http.StatusOK, data)
+}
+
+// AMQP actions
+func (a *App) saveRecommendation(b []byte) {
+	var m map[string]interface{}
+	buf := bytes.NewBuffer(b)
+	decoder := gob.NewDecoder(buf)
+	err := decoder.Decode(&m)
+	checkError(err)
+
+	var userId int
+	var labels []string
+
+	userId, _ = m["userId"].(int)
+	labels, _ = m["labels"].([]string)
+
+	r := Recommendation{
+		UserId: userId,
+		Labels: labels,		
+	}
+
+	err = r.Create(a.DB())
+	checkError(err)
 }
 
 //Helper functions

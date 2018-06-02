@@ -1,8 +1,7 @@
 db:
-  host: localhost
+  host: 192.168.99.100
   port: 27017
-  name: recomendationnews
-  collections:
-    news: news 
-app:
-  port: 5001
+svc:
+  addr: :5001
+amqp:
+  url: amqp://guest:guest@localhost:5672
