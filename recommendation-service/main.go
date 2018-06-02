@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	initConfig()
+
 	db, err := mgo.Dial(config.DB.Host)
 	checkError(err)
 	defer db.Close()

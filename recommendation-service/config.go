@@ -38,9 +38,9 @@ func (c *AppConfig) initializeEnv() error {
 	return nil
 }
 
-var config *AppConfig
+var config AppConfig
 
-func init() {
+func initConfig() {
 	var fromEnv bool
 
 	flag.BoolVar(

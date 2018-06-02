@@ -1,37 +1,42 @@
 package main
 
 import (
-	"encoding/gob"
+	"strings"
 	"bytes"
-	"github.com/streadway/amqp"
+	"encoding/json"
+	"log"
+	"net/http"
 	"reflect"
 	"strconv"
-	"encoding/json"
-	"net/http"
-	"log"
-	"github.com/gorilla/mux"
+
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/codegangsta/negroni"
+	"github.com/gorilla/mux"
+	"github.com/streadway/amqp"
 	"gopkg.in/mgo.v2"
 )
 
 const (
-	COL = "recommended_news"
-	DATABASE = "recommendations"
+	COL          = "recommended_news"
+	DATABASE     = "recommendations"
 	QUEUE_CREATE = "recommendations.create"
 )
 
 type App struct {
-	db *mgo.Session
-	mb *amqp.Channel
+	db     *mgo.Session
+	mb     *amqp.Channel
 	router *mux.Router
 }
 
 func (a *App) Initialize(db *mgo.Session, mb *amqp.Channel) {
 	a.db = db
 	a.mb = mb
+	a.initializeRoutes()
 }
 
 func (a *App) Run(addr string) {
+	a.listenQeueue()
 	n := negroni.Classic()
 	n.UseHandler(a.router)
 	log.Println("Recommendation microservice listening on port", addr)
@@ -44,13 +49,17 @@ func (a *App) DB() *mgo.Session {
 
 func (a *App) initializeRoutes() {
 	a.router = mux.NewRouter()
-	
+
+	a.router.
+		HandleFunc("/", a.hello).
+		Methods("GET")
+
 	a.router.
 		HandleFunc("/recommendations/{id}", a.getUserRecommendations).
 		Methods("GET")
 
 	a.router.
-		HandleFunc("/recommendations/byuser/{user_id:[0-9]}/", a.getUserRecommendations).
+		HandleFunc("/recommendations/byuser/{user_id:[0-9]}", a.getUserRecommendations).
 		Methods("GET")
 }
 
@@ -77,28 +86,28 @@ func (a *App) listenQeueue() {
 func (a *App) getRecommendation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	recm := &Recommendation{ID: id}
+	recm := Recommendation{ID: bson.ObjectId(id)}
 
 	if err := recm.Get(a.DB()); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			respondWithJSON(w, http.StatusNotFound, "Recommendation not found")
-		default: 
+		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 		}
 		return
-	 }
-	 
-	 respondWithJSON(w, http.StatusOK, recm)
+	}
+
+	respondWithJSON(w, http.StatusOK, recm)
 }
 
 func (a *App) getUserRecommendations(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["user_id"])
-	
+
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return		
+		return
 	}
 
 	recm := &Recommendation{UserId: id}
@@ -107,33 +116,36 @@ func (a *App) getUserRecommendations(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case mgo.ErrNotFound:
 			respondWithJSON(w, http.StatusNotFound, "Recommendations for user not found")
-		default: 
+		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 		}
 		return
-	 }
-	
-	 respondWithJSON(w, http.StatusOK, data)
+	}
+
+	respondWithJSON(w, http.StatusOK, data)
+}
+
+func (a *App) hello(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, "Hello")
 }
 
 // AMQP actions
 func (a *App) saveRecommendation(b []byte) {
-	var m map[string]interface{}
+	var msg QueueMessage
 	buf := bytes.NewBuffer(b)
-	decoder := gob.NewDecoder(buf)
-	err := decoder.Decode(&m)
+	decoder := json.NewDecoder(buf)
+	err := decoder.Decode(&msg)
 	checkError(err)
 
-	var userId int
-	var labels []string
-
-	userId, _ = m["userId"].(int)
-	labels, _ = m["labels"].([]string)
+	userId := msg["userId"].(float64)
+	labels := msg["labels"].(string)
 
 	r := Recommendation{
-		UserId: userId,
-		Labels: labels,		
+		UserId: int(userId),
+		Labels: strings.Split(labels, ","),
 	}
+
+	log.Println(r, userId, labels)
 
 	err = r.Create(a.DB())
 	checkError(err)
@@ -144,11 +156,11 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
 }
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}){
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
-	if(reflect.TypeOf(payload).String() == "string"){
+	if reflect.TypeOf(payload).String() == "string" {
 		str, _ := payload.(string)
 		w.Write([]byte(str))
 		return
