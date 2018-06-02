@@ -1,0 +1,8 @@
+db:
+  host: localhost
+  port: 27017
+  name: recomendationnews
+  collections:
+    news: news 
+app:
+  port: 5001

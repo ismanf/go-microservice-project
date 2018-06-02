@@ -22,7 +22,6 @@ type App struct {
 func (a *App) Initialize(db *sql.DB, cache Cache) {
 	a.DB = db
 	a.Cache = cache
-	a.Router = mux.NewRouter()
 	a.initializeRoutes()
 }
 
@@ -34,6 +33,7 @@ func (a *App) Run(addr string) {
 }
 
 func (a *App) initializeRoutes() {
+	a.Router = mux.NewRouter()
 	a.Router.HandleFunc("/users/{id:[0-9]}", a.getUser).Methods("GET")
 }
 
